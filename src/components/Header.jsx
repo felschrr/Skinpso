@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from '../context/AuthContext.jsx';
+import DarkMode from "./DarkMode.jsx";
 
 const Header = () => {
     const { user, logout, signInWithGoogle } = useContext(AuthContext);
@@ -21,21 +22,24 @@ const Header = () => {
     ];
 
     return (
-        <ul>
-            {routes.map((route) => (
-                route.name && ( // Rend le lien uniquement si route.name n'est pas null
-                    <li key={route.path}>
-                        {route.name === "Login" ? (
-                            <button onClick={signInWithGoogle}>{route.name}</button>
-                        ) : route.name === "Logout" ? (
-                            <button onClick={logout}>{route.name}</button>
-                        ) : (
-                            <Link to={route.path}>{route.name}</Link>
-                        )}
-                    </li>
-                )
-            ))}
-        </ul>
+        <>
+            <ul>
+                {routes.map((route) => (
+                    route.name && ( // Rend le lien uniquement si route.name n'est pas null
+                        <li key={route.path}>
+                            {route.name === "Login" ? (
+                                <button onClick={signInWithGoogle}>{route.name}</button>
+                            ) : route.name === "Logout" ? (
+                                <button onClick={logout}>{route.name}</button>
+                            ) : (
+                                <Link to={route.path}>{route.name}</Link>
+                            )}
+                        </li>
+                    )
+                ))}
+            </ul>
+            <DarkMode></DarkMode>
+        </>
     )
 };
 
