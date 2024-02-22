@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useInventory } from "../context/InventoryContext";
 import { Table } from "../components";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Inventory = () => {
-  const { inventory, addWeaponToInventory } = useInventory();
+  const { addWeaponToInventory } = useInventory();
   const [formData, setFormData] = useState({
     weapon: "",
     quantity: 1,
@@ -20,6 +18,7 @@ const Inventory = () => {
       const data = await response.json();
       console.log("Informations sur l'arme :", data.data);
       handleInventory(id, data.data);
+      
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des informations de l'arme :",
@@ -32,12 +31,11 @@ const Inventory = () => {
     try {
       const weapon_name = data.goods_infos[id].tags.weapon.localized_name;
       const weapon = {
-        id: id,
         name: weapon_name,
-        skins: [{ ...data, ...formData }],
+        skins: [{ ...data, ...formData, id }],
       };
+      console.log(weapon)
       addWeaponToInventory(weapon);
-      toast.success("Le skin a été ajouté à l'inventaire avec succès!");
     } catch (error) {
       console.error(
         "Erreur lors de l'ajout du skin dans l'inventaire: ",
@@ -148,8 +146,8 @@ const Inventory = () => {
           Add to table
         </button>
       </form>
-      <div className="mx-auto w-1/3">
-        <Table inventory={inventory} />
+      <div className="">
+        <Table/>
       </div>
     </div>
   );

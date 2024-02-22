@@ -3,9 +3,9 @@ import { Header, Footer } from './'
 import { ToastContainer } from 'react-toastify';
 
 const Layout = () => (
-    <div className=''>
+    <div className="dark:bg-gray-800">
         <Header/>
-        <main className="dark:bg-gray-800">
+        <main >
             <Outlet/>
         </main>
         <Footer/>

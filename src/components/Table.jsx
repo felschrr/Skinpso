@@ -1,14 +1,13 @@
-import { useState } from "react";
-const Table = ({ inventory }) => {
-	const [weapons, setWeapons] = useState(inventory);
+import { useInventory } from "../context/InventoryContext";
 
-	const handleDeleteSkin = (weaponIndex, skinIndex) => {
-		const updatedWeapons = [...weapons];
-		updatedWeapons[weaponIndex].skins.splice(skinIndex, 1);
-		setWeapons(updatedWeapons);
-	  };
+const Table = () => {
+	const {inventory, removeWeaponFromInventory} = useInventory();
+	console.log(inventory);
+	const handleDeleteSkin = (weaponName) => {
+		removeWeaponFromInventory(weaponName);
+	}
 	return (
-	  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+	  <table className="mx-auto w-1/3 divide-y divide-gray-200 dark:divide-gray-700">
 		<thead className="bg-gray-50 dark:bg-gray-700">
 		  <tr>
 			<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -16,6 +15,9 @@ const Table = ({ inventory }) => {
 			</th>
 			<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 			  Name
+			</th>
+			<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+			  Quality
 			</th>
 			<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 			  Quantity
@@ -46,11 +48,14 @@ const Table = ({ inventory }) => {
 					<img
 					  src={Object.values(skin.goods_infos)[0].icon_url}
 					  height="32px"
-					  alt={Object.values(skin.goods_infos)[0].name}
+					  alt={Object.values(skin.goods_infos)[0].short_name}
 					/>
 				  </td>
 				  <td className="px-6 py-4 whitespace-nowrap">
-					{Object.values(skin.goods_infos)[0].name}
+					{Object.values(skin.goods_infos)[0].short_name}
+				  </td>
+				  <td className="px-6 py-4 whitespace-nowrap">
+					{Object.values(skin.goods_infos)[0].tags.exterior.localized_name}
 				  </td>
 				  <td className="px-6 py-4 whitespace-nowrap">
 					{skin.quantity}
@@ -71,7 +76,7 @@ const Table = ({ inventory }) => {
 				  <td className="px-6 py-4 whitespace-nowrap">
 					<button
 					  className="text-red-500 hover:text-red-700"
-					  onClick={() => handleDeleteSkin(weaponIndex, skinIndex)}
+					  onClick={() => handleDeleteSkin(Object.values(skin.goods_infos)[0].name)}
 					>
 					  Supprimer
 					</button>

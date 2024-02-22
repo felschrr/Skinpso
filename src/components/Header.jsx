@@ -22,7 +22,7 @@ const Header = () => {
     ];
 
     return (
-        <header className="py-4 dark:bg-gray-700 dark:text-white shadow-md">
+        <header className="py-4 mb-16 dark:bg-gray-700 dark:text-white shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <ul className="flex space-x-4">
                     {routes.map((route) => (

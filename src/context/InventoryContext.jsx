@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { AuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 
 const InventoryContext = createContext();
 
@@ -28,23 +29,38 @@ export const InventoryProvider = ({ children }) => {
     const userRef = doc(db, "inventories", user.uid);
     const userDoc = await getDoc(userRef);
     let updatedWeapons = [];
-    if (userDoc.exists()) {
-      updatedWeapons = [...userDoc.data().weapons, weapon];
-    } else {
-      updatedWeapons.push(weapon);
+    try {
+      if (userDoc.exists()) {
+        updatedWeapons = [...userDoc.data().weapons, weapon];
+      } else {
+        updatedWeapons.push(weapon);
+      }
+      await setDoc(userRef, { weapons: updatedWeapons });
+      setInventory(updatedWeapons);
+      toast.success("Le skin a été ajouté à l'inventaire avec succès!");
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du skin dans l'inventaire: ", error);
+      toast.error("Une erreur est survenue lors de l'ajout du skin à l'inventaire.");
     }
-    await setDoc(userRef, { weapons: updatedWeapons });
-    setInventory(updatedWeapons);
   };
-  
-  const removeWeaponFromInventory = async (weaponName) => {
+
+  const removeWeaponFromInventory = async (weaponId) => {
     if (!user) return;
     const userRef = doc(db, "inventories", user.uid);
     const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      const updatedWeapons = userDoc.data().weapons.filter(weapon => weapon.name !== weaponName);
-      await setDoc(userRef, { weapons: updatedWeapons });
-      setInventory(updatedWeapons);
+    try {
+      if (userDoc.exists()) {
+        const updatedWeapons = userDoc
+          .data()
+          .weapons.filter((weapon) => weapon.id !== weaponId);
+        await setDoc(userRef, { weapons: updatedWeapons });
+        setInventory(updatedWeapons);
+        console.log(weaponId)
+        toast.success("Le skin a été supprimé à l'inventaire avec succès!");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du skin de l'inventaire: ", error);
+      toast.error("Une erreur est survenue lors de la suppression du skin de l'inventaire.");
     }
   };
 
@@ -54,5 +70,9 @@ export const InventoryProvider = ({ children }) => {
     removeWeaponFromInventory,
   };
 
-  return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>;
+  return (
+    <InventoryContext.Provider value={value}>
+      {children}
+    </InventoryContext.Provider>
+  );
 };
