@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from '../context/AuthContext.jsx';
 import DarkMode from "./DarkMode.jsx";
@@ -22,24 +22,26 @@ const Header = () => {
     ];
 
     return (
-        <>
-            <ul>
-                {routes.map((route) => (
-                    route.name && ( // Rend le lien uniquement si route.name n'est pas null
-                        <li key={route.path}>
-                            {route.name === "Login" ? (
-                                <button onClick={signInWithGoogle}>{route.name}</button>
-                            ) : route.name === "Logout" ? (
-                                <button onClick={logout}>{route.name}</button>
-                            ) : (
-                                <Link to={route.path}>{route.name}</Link>
-                            )}
-                        </li>
-                    )
-                ))}
-            </ul>
-            <DarkMode></DarkMode>
-        </>
+        <header className="py-4 dark:bg-gray-700 dark:text-white shadow-md">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <ul className="flex space-x-4">
+                    {routes.map((route) => (
+                        route.name && ( // Rend le lien uniquement si route.name n'est pas null
+                            <li key={route.path}>
+                                {route.name === "Login" ? (
+                                    <button className={`hover:text-gray-300 text-gray-800 dark:text-white`} onClick={signInWithGoogle}>{route.name}</button>
+                                ) : route.name === "Logout" ? (
+                                    <button className={`hover:text-gray-300 text-gray-800 dark:text-white`} onClick={logout}>{route.name}</button>
+                                ) : (
+                                    <Link to={route.path} className={`hover:text-gray-300 text-gray-800 dark:text-white`}>{route.name}</Link>
+                                )}
+                            </li>
+                        )
+                    ))}
+                </ul>
+                <DarkMode />
+            </div>
+        </header>
     )
 };
 

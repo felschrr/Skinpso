@@ -1,14 +1,20 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, provider } from '../config/firebase';
-import { signInWithPopup, onAuthStateChanged, GoogleAuthProvider, signOut } from "firebase/auth";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { auth } from "../config/firebase";
+import {
+  signInWithPopup,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signOut,
+} from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from '../config/firebase';
+import { db } from "../config/firebase";
+import Swal from "sweetalert2";
 
 // Création du contexte d'authentification
 const AuthContext = createContext({
-    signInWithGoogle: async () => { },
-    logout: async () => { },
-    user: null,
+  signInWithGoogle: async () => {},
+  logout: async () => {},
+  user: null,
 });
 
 const AuthProvider = ({ children }) => {
@@ -48,21 +54,19 @@ const AuthProvider = ({ children }) => {
     { name: "Tec9", skins: [] },
     { name: "UMP-45", skins: [] },
     { name: "USP-S", skins: [] },
-    { name: "XM1014", skins: [] }
+    { name: "XM1014", skins: [] },
   ];
-  
 
-  // Modification du useEffect pour récupérer les données de Firestore et les combiner 
+  // Modification du useEffect pour récupérer les données de Firestore et les combiner
   // avec les données d'authentification afin de pouvoir ajouter et supprimer des contacts.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        console.log("User : ", firebaseUser);
         // Récupération des données de l'utilisateur dans Firestore
         const userRef = doc(db, "users", firebaseUser.uid);
         const inventoryRef = doc(db, "inventories", firebaseUser.uid);
         const docSnap = await getDoc(userRef);
-        
+
         if (docSnap.exists()) {
           // Combiner les données d'authentification avec les données de Firestore
           setUser({
@@ -73,23 +77,23 @@ const AuthProvider = ({ children }) => {
           // Si l'utilisateur n'a pas de document dans Firestore, initialisez-le
           await setDoc(userRef, {
             uid: firebaseUser.uid,
-            displayName: firebaseUser.displayName.toLowerCase() || '',
-            email: firebaseUser.email || '',
-            photoURL: firebaseUser.photoURL || '',
-            signInDate: firebaseUser.metadata.creationTime || '',
+            displayName: firebaseUser.displayName.toLowerCase() || "",
+            email: firebaseUser.email || "",
+            photoURL: firebaseUser.photoURL || "",
+            signInDate: firebaseUser.metadata.creationTime || "",
           });
           // Si l'utilisateur n'a pas de document inventaire dans Firestore, initialisez-le
           await setDoc(inventoryRef, {
             weapons: weapons,
           });
-        
+
           setUser({
             ...firebaseUser,
             uid: firebaseUser.uid,
-            displayName: firebaseUser.displayName.toLowerCase() || '',
-            email: firebaseUser.email || '',
-            photoURL: firebaseUser.photoURL || '',
-            signInDate: firebaseUser.metadata.creationTime || '',
+            displayName: firebaseUser.displayName.toLowerCase() || "",
+            email: firebaseUser.email || "",
+            photoURL: firebaseUser.photoURL || "",
+            signInDate: firebaseUser.metadata.creationTime || "",
           });
         }
       } else {
@@ -99,7 +103,7 @@ const AuthProvider = ({ children }) => {
     });
     return () => unsubscribe();
   }, []);
-  
+
   // Fonction pour se connecter via Google
   const signInWithGoogle = async () => {
     try {
@@ -110,10 +114,27 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fonction pour se déconnecter
-  const logout = async () => {
-    await signOut(auth);
-  };
+// Fonction pour se déconnecter avec confirmation
+const logout = async () => {
+  Swal.fire({
+    title: 'Confirmation',
+    text: 'Voulez-vous vraiment vous déconnecter ?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Non',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      await signOut(auth); // Si l'utilisateur confirme, procédez à la déconnexion
+      Swal.fire({
+        title: 'Déconnexion réussie',
+        text: 'Vous avez été déconnecté avec succès.',
+        icon: 'success',
+      });
+    }
+  });
+};
+
 
   const value = {
     signInWithGoogle,
@@ -127,7 +148,6 @@ const AuthProvider = ({ children }) => {
       {loading ? <div>User data loading...</div> : children}
     </AuthContext.Provider>
   );
-
 };
 
 const useAuth = () => useContext(AuthContext);

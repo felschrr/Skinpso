@@ -1,33 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../context/AuthContext.jsx";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
+import React, { useState } from "react";
+import { useInventory } from "../context/InventoryContext";
 import { Table } from "../components";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Inventory = () => {
-  const { user } = useContext(AuthContext);
-  const [inventory, setInventory] = useState([]);
+  const { inventory, addWeaponToInventory } = useInventory();
   const [formData, setFormData] = useState({
     weapon: "",
     quantity: 1,
     buyPrice: 0,
   });
-
-  useEffect(() => {
-    const fetchInventory = async () => {
-      const userRef = doc(db, "inventories", user.uid);
-      const docSnap = await getDoc(userRef);
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        setInventory(userData.weapons ?? []);
-      }
-    };
-    fetchInventory();
-  }, []);
-
-  useEffect(() => {
-    console.log("Inventory: ", inventory);
-  }, [inventory]);
 
   const fetchWeaponInfo = async (id) => {
     try {
@@ -48,43 +31,13 @@ const Inventory = () => {
   const handleInventory = async (id, data) => {
     try {
       const weapon_name = data.goods_infos[id].tags.weapon.localized_name;
-      const userRef = doc(db, "inventories", user.uid);
-      const userDoc = await getDoc(userRef);
-      const { quantity, buyPrice } = formData;
-      if (userDoc.exists()) {
-        const currentData = userDoc.data().weapons ?? [];
-        const weaponIndex = currentData.findIndex(
-          (weapon) => weapon.name === weapon_name
-        );
-        let updatedWeapons;
-        if (weaponIndex !== -1) {
-          updatedWeapons = currentData.map((weapon, index) => {
-            if (index === weaponIndex) {
-              return {
-                ...weapon,
-                skins: [...weapon.skins, { ...data, quantity, buyPrice }],
-              };
-            } else {
-              return weapon;
-            }
-          });
-        } else {
-          updatedWeapons = [
-            ...currentData,
-            {
-              name: weapon_name,
-              skins: [{ ...data, formData }],
-            },
-          ];
-        }
-
-        const updatedData = {
-          ...userDoc.data(),
-          weapons: updatedWeapons,
-        };
-        setInventory(updatedData.weapons || []);
-        await setDoc(userRef, updatedData);
-      }
+      const weapon = {
+        id: id,
+        name: weapon_name,
+        skins: [{ ...data, ...formData }],
+      };
+      addWeaponToInventory(weapon);
+      toast.success("Le skin a été ajouté à l'inventaire avec succès!");
     } catch (error) {
       console.error(
         "Erreur lors de l'ajout du skin dans l'inventaire: ",
@@ -130,28 +83,13 @@ const Inventory = () => {
 
   return (
     <div className={`dark:bg-gray-800 dark:text-white`}>
-      {user ? (
-        <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md p-4">
-          <div className="flex items-center space-x-4">
-            <img
-              className="h-12 w-12 rounded-full"
-              src={user.photoURL}
-              alt={`${user.displayName} profile picture`}
-            />
-            <div>
-              <h1 className="text-lg font-semibold dark:text-white">{user.displayName}</h1>
-              <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        "Pas d'utilisateur trouvé"
-      )}
       <form
         onSubmit={(e) => handleSubmit(e)}
         className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-md overflow-hidden shadow-md p-6"
       >
-      <h2 className="text-2xl font-extrabold mb-4 dark:text-white">Inventaire - Armes</h2>
+        <h2 className="text-2xl font-extrabold mb-4 dark:text-white">
+          Inventaire - Armes
+        </h2>
         <div className="mb-4">
           <label
             htmlFor="weapon"
@@ -211,7 +149,7 @@ const Inventory = () => {
         </button>
       </form>
       <div className="mx-auto w-1/3">
-        <Table inventory={inventory}/>
+        <Table inventory={inventory} />
       </div>
     </div>
   );
