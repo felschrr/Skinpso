@@ -1,3 +1,3 @@
-# CS Skins Follow up
+# Skinpso 
 
-Application pour suivre ses investissements de skins CS2
+Application React pour suivre ses investissements de skins CS2
