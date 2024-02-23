@@ -115,7 +115,6 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Erreur lors de la connexion avec Google :", error);
       toast.error("Erreur lors de la connexion avec Google : ", error);
-
     }
   };
 
