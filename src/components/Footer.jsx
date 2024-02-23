@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
     return (
-        <footer className="mt-16 py-4 dark:bg-gray-700 dark:text-white">
+        <footer className="border-t-[1px] border-gray-200 dark:border-t-[0px] mt-16 py-4 dark:bg-gray-700 dark:text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div>
                     <p className="text-gray-800 dark:text-white">© 2024 Skinpso. All rights reserved.</p>

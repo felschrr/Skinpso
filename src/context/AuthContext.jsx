@@ -9,6 +9,7 @@ import {
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 // Création du contexte d'authentification
 const AuthContext = createContext({
@@ -109,8 +110,12 @@ const AuthProvider = ({ children }) => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      toast.success("Connexion réussie!");
+
     } catch (error) {
       console.error("Erreur lors de la connexion avec Google :", error);
+      toast.error("Erreur lors de la connexion avec Google : ", error);
+
     }
   };
 
