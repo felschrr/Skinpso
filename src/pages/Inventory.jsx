@@ -16,9 +16,7 @@ const Inventory = () => {
         `http://localhost:4000/buff-proxy/api/market/goods/sell_order?game=csgo&goods_id=${id}`
       );
       const data = await response.json();
-      console.log("Informations sur l'arme :", data.data);
       handleInventory(id, data.data);
-      
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des informations de l'arme :",
@@ -29,12 +27,7 @@ const Inventory = () => {
 
   const handleInventory = async (id, data) => {
     try {
-      const weapon_name = data.goods_infos[id].tags.weapon.localized_name;
-      const weapon = {
-        name: weapon_name,
-        skins: [{ ...data, ...formData, id }],
-      };
-      console.log(weapon)
+      const weapon = {...data, ...formData, id };
       addWeaponToInventory(weapon);
     } catch (error) {
       console.error(
@@ -146,9 +139,7 @@ const Inventory = () => {
           Add to table
         </button>
       </form>
-      <div className="">
-        <Table/>
-      </div>
+      <Table />
     </div>
   );
 };
