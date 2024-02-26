@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -18,14 +18,25 @@ const AuthContext = createContext({
   logout: async () => {},
   user: null,
   currency: "CNY", // Devise par défaut
+  darkMode: false, // Thème par défaut
   setCurrency: () => {},
+  setDarkMode: () => {},
 });
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState("CNY"); // Devise par défaut
+  const [darkMode, setDarkMode] = useState(() => {
+    // Tenter de récupérer le mode sombre depuis localStorage
+    const savedMode = localStorage.getItem("darkMode");
+    return savedMode ? JSON.parse(savedMode) : false; // Fallback à false si non trouvé
+  });
 
+  useEffect(() => {
+    // Sauvegarder l'état darkMode dans localStorage chaque fois qu'il change
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+  }, [darkMode]);
   // Modification du useEffect pour récupérer les données de Firestore et les combiner
   // avec les données d'authentification afin de pouvoir ajouter et supprimer des contacts.
   useEffect(() => {
@@ -51,6 +62,7 @@ const AuthProvider = ({ children }) => {
             photoURL: firebaseUser.photoURL || "",
             signInDate: firebaseUser.metadata.creationTime || "",
             currency: "CNY", // Définir la devise par défaut
+            darkMode: false, // Ajouter le thème par défaut
           });
           // Si l'utilisateur n'a pas de document inventaire dans Firestore, initialisez-le
           await setDoc(inventoryRef, {
@@ -65,6 +77,7 @@ const AuthProvider = ({ children }) => {
             photoURL: firebaseUser.photoURL || "",
             signInDate: firebaseUser.metadata.creationTime || "",
             currency: "CNY", // Définir la devise par défaut
+            darkMode: false, // Ajouter le thème par défaut
           });
         }
       } else {
@@ -104,22 +117,32 @@ const AuthProvider = ({ children }) => {
     });
   };
 
+  // Fonction pour mettre à jour le thème
+  const updateDarkMode = async (userId, newValue) => {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      darkMode: newValue,
+    });
+    setDarkMode(newValue);
+  };
+
   const value = {
     signInWithGoogle,
     logout,
     user,
-    setUser,
     currency,
+    darkMode,
     setCurrency,
+    setDarkMode: updateDarkMode,
   };
 
   return (
     <AuthContext.Provider value={value}>
       {loading ? (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex items-center justify-center h-screen">
           {/* SVG ou animation de chargement */}
           <svg
-            className="animate-spin -ml-1 mr-3 h-10 w-10 text-slate-500"
+            className="w-10 h-10 mr-3 -ml-1 animate-spin text-slate-500"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

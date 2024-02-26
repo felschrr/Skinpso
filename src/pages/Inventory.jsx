@@ -27,7 +27,7 @@ const Inventory = () => {
 
   const handleInventory = async (id, data) => {
     try {
-      const weapon = {...data, ...formData, id };
+      const weapon = { ...data, ...formData, id };
       addWeaponToInventory(weapon);
     } catch (error) {
       console.error(
@@ -76,9 +76,9 @@ const Inventory = () => {
     <div className={`dark:bg-gray-800 dark:text-white`}>
       <form
         onSubmit={(e) => handleSubmit(e)}
-        className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-md overflow-hidden shadow-md p-6"
+        className="max-w-md p-6 mx-auto overflow-hidden bg-white rounded-md shadow-md dark:bg-gray-800"
       >
-        <h2 className="text-2xl font-extrabold mb-4 dark:text-white">
+        <h2 className="mb-4 text-2xl font-extrabold dark:text-white">
           Inventaire - Armes
         </h2>
         <div className="mb-4">
@@ -95,7 +95,7 @@ const Inventory = () => {
             value={formData.weapon}
             onChange={handleChange}
             placeholder="Paste item's Buff163 link / ID"
-            className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
+            className="w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
           />
         </div>
         <div className="mb-4">
@@ -112,7 +112,7 @@ const Inventory = () => {
             value={formData.quantity}
             onChange={handleChange}
             placeholder="Quantity"
-            className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
+            className="w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
           />
         </div>
         <div className="mb-4">
@@ -129,12 +129,12 @@ const Inventory = () => {
             value={formData.buyPrice}
             onChange={handleChange}
             placeholder="Buy Price (¥)"
-            className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
+            className="w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700"
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200"
+          className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200"
         >
           Add to table
         </button>

@@ -26,15 +26,24 @@ export const InventoryProvider = ({ children }) => {
   }, [user]);
 
   const addWeaponToInventory = async (skin) => {
-    const weaponName = Object.values(skin.goods_infos)[0].tags.category.localized_name;
+    const weaponName = Object.values(skin.goods_infos)[0].tags.category
+      .localized_name;
     const uniqueId = uuid(); // Générer un identifiant unique
     try {
       let updatedInventory = [...inventory];
-      const existingWeaponIndex = updatedInventory.findIndex(w => w.name === weaponName);
+      const existingWeaponIndex = updatedInventory.findIndex(
+        (w) => w.name === weaponName
+      );
       if (existingWeaponIndex !== -1) {
-        updatedInventory[existingWeaponIndex].skins.push({ ...skin, id: uniqueId });
+        updatedInventory[existingWeaponIndex].skins.push({
+          ...skin,
+          id: uniqueId,
+        });
       } else {
-        updatedInventory.push({ name: weaponName, skins: [{ ...skin, id: uniqueId }] });
+        updatedInventory.push({
+          name: weaponName,
+          skins: [{ ...skin, id: uniqueId }],
+        });
       }
       setInventory(updatedInventory);
       if (!user) return;

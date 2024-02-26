@@ -12,7 +12,7 @@ const firebaseConfig = {
   projectId: "cs-skins-eda31",
   storageBucket: "cs-skins-eda31.appspot.com",
   messagingSenderId: "514605161235",
-  appId: "1:514605161235:web:f1c5fb4d128817314a18e6"
+  appId: "1:514605161235:web:f1c5fb4d128817314a18e6",
 };
 
 // Initialize Firebase
