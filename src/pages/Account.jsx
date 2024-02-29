@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useUser } from "../context/UserContext.jsx";
-import { FriendList } from "../components";
+import { FriendList, AddFriend } from "../components";
+
 const Account = () => {
     const { user } = useAuth();
     const {
@@ -107,7 +108,8 @@ const Account = () => {
                     </span>
                 </div>
             </div>
-            <FriendList />
+            <FriendList/>
+            <AddFriend/>
         </div>
     );
 };

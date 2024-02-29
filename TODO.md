@@ -19,10 +19,10 @@
 
 ## Social
 
-- [ ] Ajouter des contacts.
-- [ ] Enlever des contacts.
+- [X] Ajouter des contacts.
+- [X] Enlever des contacts.
 - [ ] Voir l'inventaire des contacts.
-- [ ] Basculer la visibilité de son inventaire en public / privé.
+- [X] Basculer la visibilité de son inventaire en public / privé.
 
 # Design
 
