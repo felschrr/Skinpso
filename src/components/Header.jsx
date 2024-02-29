@@ -1,10 +1,8 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx";
-import DarkMode from "./DarkMode.jsx";
-
 const Header = () => {
-  const { user, logout, signInWithGoogle } = useContext(AuthContext);
+  const { logout, signInWithGoogle, user } = useContext(AuthContext);
 
   const routes = [
     {
@@ -14,6 +12,10 @@ const Header = () => {
     {
       name: user ? "Inventory" : null, // Ne rend rien si l'utilisateur n'est pas connecté
       path: user ? "/inventory" : null,
+    },
+    {
+      name: user ? "Profile" : null, // Ne rend rien si l'utilisateur n'est pas connecté
+      path: user ? "/profile" : null,
     },
     {
       name: user ? "Logout" : "Login",
@@ -55,7 +57,6 @@ const Header = () => {
               )
           )}
         </ul>
-        <DarkMode />
       </div>
     </header>
   );

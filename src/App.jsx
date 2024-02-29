@@ -5,9 +5,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Layout } from "./components";
-import { Home, Inventory } from "./pages";
+import { Home, Inventory, Profile, Contact } from "./pages";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { InventoryProvider } from "./context/InventoryContext.jsx";
+import { UserProvider } from "./context/UserContext.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { SocialProvider } from "./context/SocialContext.jsx";
 
 const PrivateRoute = ({ element }) => {
   const { user } = useAuth();
@@ -28,6 +31,14 @@ const App = () => {
           path: "/inventory",
           element: <PrivateRoute element={<Inventory />} />,
         },
+        {
+          path: "/profile",
+          element: <PrivateRoute element={<Profile />} />,
+        },
+        {
+          path: "/user/:username",
+          element: <PrivateRoute element={<Contact />} />,
+        },
       ],
     },
     {
@@ -38,25 +49,35 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <InventoryProvider>
-        <Router>
-          <Routes>
-            {routes.map((route, index) => (
-              <Route key={index} path={route.path} element={route.element}>
-                {route.children &&
-                  route.children.map((child, childIndex) => (
+      <UserProvider>
+        <SocialProvider>
+          <ThemeProvider>
+            <InventoryProvider>
+              <Router>
+                <Routes>
+                  {routes.map((route, index) => (
                     <Route
-                      key={childIndex}
-                      index={child.index}
-                      path={child.path}
-                      element={child.element}
-                    />
+                      key={index}
+                      path={route.path}
+                      element={route.element}
+                    >
+                      {route.children &&
+                        route.children.map((child, childIndex) => (
+                          <Route
+                            key={childIndex}
+                            index={child.index}
+                            path={child.path}
+                            element={child.element}
+                          />
+                        ))}
+                    </Route>
                   ))}
-              </Route>
-            ))}
-          </Routes>
-        </Router>
-      </InventoryProvider>
+                </Routes>
+              </Router>
+            </InventoryProvider>
+          </ThemeProvider>
+        </SocialProvider>
+      </UserProvider>
     </AuthProvider>
   );
 };

@@ -6,86 +6,62 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import weapons from "../../public/data/weapons";
+import weapons from "../../public/data/weapons"; // Assurez-vous que ce chemin est correct et accessible
 
 // Création du contexte d'authentification
-const AuthContext = createContext({
-  signInWithGoogle: async () => {},
-  logout: async () => {},
-  user: null,
-  currency: "CNY", // Devise par défaut
-  darkMode: false, // Thème par défaut
-  setCurrency: () => {},
-  setDarkMode: () => {},
-});
+const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState("CNY"); // Devise par défaut
-  const [darkMode, setDarkMode] = useState(() => {
-    // Tenter de récupérer le mode sombre depuis localStorage
-    const savedMode = localStorage.getItem("darkMode");
-    return savedMode ? JSON.parse(savedMode) : false; // Fallback à false si non trouvé
-  });
 
-  useEffect(() => {
-    // Sauvegarder l'état darkMode dans localStorage chaque fois qu'il change
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
-  // Modification du useEffect pour récupérer les données de Firestore et les combiner
-  // avec les données d'authentification afin de pouvoir ajouter et supprimer des contacts.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Récupération des données de l'utilisateur dans Firestore
         const userRef = doc(db, "users", firebaseUser.uid);
-        const inventoryRef = doc(db, "inventories", firebaseUser.uid);
         const docSnap = await getDoc(userRef);
 
-        if (docSnap.exists()) {
-          // Combiner les données d'authentification avec les données de Firestore
-          setUser({
-            ...firebaseUser, // Données de l'authentification Firebase
-            ...docSnap.data(), // Données supplémentaires de Firestore
-          });
-        } else {
-          // Si l'utilisateur n'a pas de document dans Firestore, initialisez-le
+        if (!docSnap.exists()) {
+          // Création du document utilisateur et inventaire s'ils n'existent pas
           await setDoc(userRef, {
             uid: firebaseUser.uid,
-            displayName: firebaseUser.displayName.toLowerCase() || "",
+            displayName: firebaseUser.displayName?.toLowerCase() || "",
             email: firebaseUser.email || "",
             photoURL: firebaseUser.photoURL || "",
             signInDate: firebaseUser.metadata.creationTime || "",
-            currency: "CNY", // Définir la devise par défaut
-            darkMode: false, // Ajouter le thème par défaut
-          });
-          // Si l'utilisateur n'a pas de document inventaire dans Firestore, initialisez-le
-          await setDoc(inventoryRef, {
-            weapons: weapons,
+            currency: "CNY",
+            theme: "default",
+            contacts: [],
+            visibility: true,
           });
 
-          setUser({
-            ...firebaseUser,
-            uid: firebaseUser.uid,
-            displayName: firebaseUser.displayName.toLowerCase() || "",
-            email: firebaseUser.email || "",
-            photoURL: firebaseUser.photoURL || "",
-            signInDate: firebaseUser.metadata.creationTime || "",
-            currency: "CNY", // Définir la devise par défaut
-            darkMode: false, // Ajouter le thème par défaut
-          });
+          // Initialisation de l'inventaire de l'utilisateur
+          const inventoryRef = doc(db, "inventories", firebaseUser.uid);
+          await setDoc(inventoryRef, { weapons });
         }
+
+        // Mise à jour de l'état utilisateur avec les données Firestore ou des valeurs par défaut
+        setUser({
+          uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName?.toLowerCase() || "",
+          email: firebaseUser.email || "",
+          photoURL: firebaseUser.photoURL || "",
+          signInDate: firebaseUser.metadata.creationTime || "",
+          ...docSnap.data(),
+        });
       } else {
         setUser(null);
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    // Nettoyage de l'effet
+    return unsubscribe;
   }, []);
 
   // Fonction pour se connecter via Google
@@ -93,10 +69,10 @@ const AuthProvider = ({ children }) => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      toast.success("Connexion réussie!");
+      toast.success("Connexion réussie !");
     } catch (error) {
-      console.error("Erreur lors de la connexion avec Google :", error);
-      toast.error("Erreur lors de la connexion avec Google : ", error);
+      console.error("Erreur lors de la connexion avec Google:", error);
+      toast.error(`Erreur lors de la connexion avec Google: ${error.message}`);
     }
   };
 
@@ -111,30 +87,13 @@ const AuthProvider = ({ children }) => {
       cancelButtonText: "Non",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await signOut(auth); // Si l'utilisateur confirme, procédez à la déconnexion
-        toast.success("Déconnexion réussie!");
+        await signOut(auth);
+        toast.success("Déconnexion réussie !");
       }
     });
   };
 
-  // Fonction pour mettre à jour le thème
-  const updateDarkMode = async (userId, newValue) => {
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      darkMode: newValue,
-    });
-    setDarkMode(newValue);
-  };
-
-  const value = {
-    signInWithGoogle,
-    logout,
-    user,
-    currency,
-    darkMode,
-    setCurrency,
-    setDarkMode: updateDarkMode,
-  };
+  const value = { user, signInWithGoogle, logout };
 
   return (
     <AuthContext.Provider value={value}>
