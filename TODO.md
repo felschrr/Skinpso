@@ -10,7 +10,7 @@
 - [X] Suppression d'un skin.
 - [ ] Trier / filtrer le tableau en fonction de l'arme.
 - [X] Choisir sa devise.
-- [ ] Adapter les prix selon la devise choisie.
+- [X] Adapter les prix selon la devise choisie.
 
 ## Graphique
 

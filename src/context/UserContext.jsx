@@ -16,6 +16,11 @@ export const UserProvider = ({ children }) => {
     const [currency, setCurrency] = useState("CNY");
     const [theme, setTheme] = useState("default");
     const [visibility, setVisibility] = useState(true); // Correction : initialisation avec un boolean
+    const currencySymbols = {
+        USD: '$', // Dollar Américain
+        EUR: '€', // Euro
+        CNY: '¥', // Yuan Chinois
+    };
 
     useEffect(() => {
         if (user) {
@@ -73,6 +78,7 @@ export const UserProvider = ({ children }) => {
 
     const value = {
         currency,
+        currencySymbols,
         theme,
         visibility,
         setVisibility: updateVisibility, // Correction : utilisation de la fonction d'updateVisibility

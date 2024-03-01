@@ -12,7 +12,8 @@ export const useInventory = () => useContext(InventoryContext);
 export const InventoryProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [inventory, setInventory] = useState([]);
-
+    const [exchangeRates, setExchangeRates] = useState(null);
+    
     useEffect(() => {
         if (!user) return;
         const fetchInventory = async () => {
@@ -24,6 +25,30 @@ export const InventoryProvider = ({ children }) => {
         };
         fetchInventory();
     }, [user]);
+
+
+    useEffect(() => {
+        const fetchExchangeRates = async () => {
+            try {
+                const response = await fetch(
+                    "https://api.exchangerate-api.com/v4/latest/CNY"
+                );
+                if (!response.ok) {
+                    throw new Error("Failed to fetch exchange rates");
+                }
+                const data = await response.json();
+                const rates = {
+                    EUR: data.rates.EUR,
+                    USD: data.rates.USD,
+                };
+                setExchangeRates(rates);
+            } catch (error) {
+                console.error("Error fetching exchange rates:", error);
+            }
+        };
+        
+        fetchExchangeRates();
+    }, []);
 
     const addWeaponToInventory = async (skin) => {
         const weaponName = Object.values(skin.goods_infos)[0].tags.category
@@ -86,6 +111,7 @@ export const InventoryProvider = ({ children }) => {
 
     const value = {
         inventory,
+        exchangeRates,
         addWeaponToInventory,
         removeWeaponFromInventory,
     };

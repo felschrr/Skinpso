@@ -1,16 +1,23 @@
 import { useInventory } from "../context/InventoryContext";
 import { motion } from "framer-motion";
+import { useUser } from "../context/UserContext";
 
 const Table = () => {
-    const { inventory, removeWeaponFromInventory } = useInventory();
+    const { inventory, exchangeRates, removeWeaponFromInventory } =
+        useInventory();
+    const { currency, currencySymbols } = useUser();
 
-    const handleDeleteSkin = (weaponName) => {
-        removeWeaponFromInventory(weaponName);
+    const convertCurrency = (price) => {
+        if (!exchangeRates || !exchangeRates[currency])
+            return price + " " + currencySymbols["CNY"]; // Retourner la devise si le taux n'est pas trouvé
+        const convertedPrice = price * exchangeRates[currency];
+        const symbol = currencySymbols[currency] || currency; // Utilisez le symbole de la devise si disponible, sinon l'acronyme de la devise
+        return convertedPrice.toFixed(2) + " " + symbol;
     };
 
     return (
         <motion.table
-            className="w-1/3 mx-auto divide-y divide-gray-200 dark:divide-gray-700"
+            className="w-1/3 mx-auto border border-gray-200 divide-y divide-gray-200 rounded-lg dark:border-gray-600 border-1 dark:divide-gray-700"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -88,10 +95,10 @@ const Table = () => {
                                         {skin.quantity}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {skin.buyPrice}
+                                        {convertCurrency(skin.buyPrice)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {skin.items[0].price} ¥
+                                        {convertCurrency(skin.items[0].price)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {(
@@ -106,7 +113,9 @@ const Table = () => {
                                         <button
                                             className="text-red-500 hover:text-red-700"
                                             onClick={() =>
-                                                handleDeleteSkin(skin.id)
+                                                removeWeaponFromInventory(
+                                                    skin.id
+                                                )
                                             }
                                         >
                                             Supprimer

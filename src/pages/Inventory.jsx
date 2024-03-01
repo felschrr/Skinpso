@@ -73,10 +73,10 @@ const Inventory = () => {
     };
 
     return (
-        <div className={`dark:bg-gray-800 dark:text-white`}>
+        <div className={` dark:bg-gray-800 dark:text-white`}>
             <form
                 onSubmit={(e) => handleSubmit(e)}
-                className="max-w-md p-6 mx-auto overflow-hidden bg-white rounded-md shadow-md dark:bg-gray-800"
+                className="max-w-md p-6 mx-auto mb-8 overflow-hidden bg-white border border-gray-200 rounded-md shadow-md dark:border-gray-600 dark:bg-gray-800"
             >
                 <h2 className="mb-4 text-2xl font-extrabold dark:text-white">
                     Inventaire - Armes
